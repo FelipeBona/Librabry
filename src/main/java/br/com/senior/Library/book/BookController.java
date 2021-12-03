@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-@RequestMapping("/Book")
+@RequestMapping("/book")
 public class BookController {
 
     @Autowired
@@ -22,7 +22,7 @@ public class BookController {
     @PostMapping
     public ResponseEntity<BookDto> addBook(@RequestBody BookDto bookDto) {
 
-        if(bookDto != null){
+        if(!bookDto.name.isEmpty() && !bookDto.author.isEmpty()){
             final Book bookEntity = bookMapper.toEntity(bookDto);
             final Book bookSaved = bookRepository.save(bookEntity);
             BookDto dto = bookMapper.toDto(bookSaved);
@@ -79,13 +79,13 @@ public class BookController {
             BookDto dto = bookMapper.toDto(book);
             return new ResponseEntity<>(dto, HttpStatus.OK);
         }
-        return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+        throw new BookNotFoundException();
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<BookDto> updateBook(@RequestBody BookDto newbookDto, @PathVariable(value = "id") Long id){
 
-        if(newbookDto != null && id != null){
+        if(!newbookDto.name.isEmpty() && !newbookDto.author.isEmpty()){
             Book book = bookRepository.getById(id);
             book.setName(newbookDto.name);
             book.setAuthor(newbookDto.author);
@@ -102,8 +102,7 @@ public class BookController {
 
     @DeleteMapping
     public void deletBook(@RequestBody BookDto bookDto) {
-
-        if(bookDto != null){
+        if(!bookDto.name.isEmpty() && !bookDto.author.isEmpty()){
             Book bookDelet = bookMapper.toEntity(bookDto);
             bookRepository.delete(bookDelet);
         } else{
